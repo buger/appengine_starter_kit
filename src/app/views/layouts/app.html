@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        {{ "reset-min"|stylesheet }}        
+        {{ "fonts-min"|stylesheet }}        
+        
+        {{ "960_12_col"|stylesheet }}        
+    </head>
+
+    <body>
+        <div class="container_12">     
+        {% block content %}        
+        {% endblock %}
+        </div>
+
+        {{ "jquery.min"|javascript }}       
+        {{ "underscore.min"|javascript }}       
+        {{ "backbone.min"|javascript }}       
+        
+        {{ "application"|javascript }}       
+
+        {% block javascript %}
+        {% endblock %}
+    </body>
+</html>

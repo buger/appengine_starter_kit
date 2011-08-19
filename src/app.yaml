@@ -1,0 +1,39 @@
+application: hl-game
+version: 1
+runtime: python
+api_version: 1
+
+default_expiration: "10d"
+
+handlers:
+
+- url: /remote_api
+  script: $PYTHON_LIB/google/appengine/ext/remote_api/handler.py
+  login: admin
+  
+- url: /css
+  static_dir: media/css
+
+- url: /js
+  static_dir: media/js
+
+- url: /images
+  static_dir: media/images
+
+# htc file should be insed root dir
+- url: /PIE.htc
+  static_files: media/css/PIE.htc
+  upload: media/css/PIE.htc
+  mime_type: text/x-component
+
+- url: /favicon.png
+  static_files: media/images/favicon.png
+  upload: media/images/favicon.png
+
+# Main handler
+- url: /.*
+  script: main.py
+
+builtins:
+ - datastore_admin: on
+ - remote_api: on

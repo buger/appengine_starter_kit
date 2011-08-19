@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Ксервису.рф</title>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+    
+    {{ "style"|stylesheet }}
+</head>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23963816-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+<body>
+    <div id="wrapper">
+        {% if session.flash %}
+        <div id="flash_message">{{session.flash}}</div>
+        {% endif %}            
+
+        <div id="header">
+            <div id="top">Позвоните нам на (495) 960-2043 или <a href="http://itwarranty.m.octopusline.net/widgets/callme_new.php?service_instance_id=281" target="_blank">мы позвоним сами</a></div>
+            <div id="logo">
+                {% block logo %}
+                <a href="/index.html">
+                    <img src="images/logo.png" width="140" height="40" alt="logo" align="right">
+                </a>
+                {% endblock %}
+            </div>
+        </div>
+        {% include "./inc/head.html" %}
+        <div id="clear"></div>
+        <div id="menu">
+            <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                    {% block menu %}
+                    <td width="25%" class="news"><a href="news.html">Новости</a></td>
+                    <td width="25%" class="ourwork"><a href="ourwork.html">Наша работа</a></td>
+                    <td width="25%" class="company"><a href="company.html">Компания</a></td>
+                    <td width="25%" class="my"><a href="/my">Оставить заявку</a></td>
+                    {% endblock %}
+                </tr>	
+            </table>
+        </div>
+        <div id="clear"></div>
+        <div id="zajav">
+            {% block banner %}{% endblock %} 
+        </div>
+        <div id="clear"></div>
+        {% block cvalification %}
+            {% include "./inc/cvalification.html" %}
+        {% endblock %}
+        <div id="clear"></div>
+        <div id="content">
+            {% block content %}{% endblock %}
+
+	        <div id="clear"></div>
+        </div>
+        {% block fmenu %}
+        <div id="fmenu">
+            <a href="clear.html">Партнёры</a> | <a href="http://maps.google.ru/maps?cid=6742348402889720280&ssa=1&hl=ru&ie=UTF8&hq=&hnear=&z=7&iwloc=A">Территория обслуживания</a> | <a href="clear.html">Центр компетенций</a> | <a href="ratings.html">Рейтинги</a> | <a href="job.html">Есть работа</a>
+        </div>
+        {% endblock %}
+	    <div id="clear"></div>
+        {% include "./inc/footer.html" %}
+    </div>
+
+    <script type="text/javascript" src="/js/base/jquery.min.js"></script>
+
+    <script>
+        $('#flash_message').delay(3000).fadeOut(1000);
+
+        $('#menu .login').bind('click', function(evt){
+            $(this).next().toggle();
+
+            evt.stopPropagation();
+        });
+
+        $(document).bind('click', function(evt){
+            if ($(evt.target).closest('.login_form').length == 0)            
+                $('#menu .login_form').hide();
+        });
+
+        $('.form.issue input[type="checkbox"]').bind('change', function(){
+            var form = $(this.form);
+
+            console.log('asd');
+            if (form.find('input[type="checkbox"]:checked').length == 2) {
+                form.find('input[type="submit"]').removeAttr('disabled');
+            } else {
+                form.find('input[type="submit"]').attr('disabled', 'disabled');
+            }
+        });
+    </script>
+</body>
+</html>
+
