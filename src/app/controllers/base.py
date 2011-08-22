@@ -10,7 +10,8 @@ import simplejson as json
 from app.models import *
 
 from lib.counter import *
-from lib.secure_cookie_session import Session
+from lib.secure_cookie_session import CookieSession
+from lib.model_to_json import *
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -20,6 +21,7 @@ from google.appengine.api import users
 
 template.register_template_library('app.template_tags.media_tag')
 template.register_template_library('app.template_tags.with_tag')
+template.register_template_library('app.template_tags.json')
 
 def is_production_mode():
     return os.environ['SERVER_NAME'] != 'localhost'
@@ -39,6 +41,14 @@ class AppHandler(webapp.RequestHandler):
 
         return os.environ['i18n_lang']
 
+    @property
+    def login_url(self):
+        return users.create_login_url(self.request.uri)
+    
+    @property
+    def logout_url(self):
+        return users.create_logout_url(self.request.uri)
+
     def render_template(self, name, data = None):
         self.guess_lang()
 
@@ -50,12 +60,16 @@ class AppHandler(webapp.RequestHandler):
         if not data.has_key('admin'):
             data['admin'] = users.is_current_user_admin()
 
-        data['lang'] = os.environ['i18n_lang']
+        data.update({
+            'user': users.get_current_user(),
+            'lang': os.environ['i18n_lang'],
+            'session': self.session,            
+            'production': is_production_mode(),
 
-        data['session'] = self.session
-
-        data['production'] = is_production_mode()
-
+            'login_url': self.login_url,
+            'logout_url': self.logout_url
+        })
+       
         html = template.render(path, data)
 
         if not data.has_key('dont_render'):
@@ -68,12 +82,16 @@ class AppHandler(webapp.RequestHandler):
 
         return html
 
+    
+    def render_json(self, data, status = None):
+        if status:
+            self.response.set_status(status)
 
-    def render_json(self, data):
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(data))
+        self.response.out.write(json.dumps(data))        
 
     def render_text(self, string):
+        self.response.headers['Content-Type'] = 'text'
         self.response.out.write(string)
 
     # Example:
@@ -89,8 +107,8 @@ class AppHandler(webapp.RequestHandler):
         try:
             return self._session
         except AttributeError:
-            self._session = Session(self)
-            return self._session
+            self._session = CookieSession(self)
+            return self._session    
 
 
 
@@ -131,6 +149,23 @@ def start():
 
     application = webapp.WSGIApplication(app_routes, debug=True)
     run_wsgi_app(application)
+
+class RoutesViewer(AppHandler):
+    def get(self):
+        text = []
+
+        for subdomain in routes:
+            text.append(subdomain)
+
+            sorted_routes = sorted(routes[subdomain])
+
+            for route in sorted_routes:
+                text.append("\n\t%s %s" % (route[0].ljust(40), str(route[1])))
+
+        self.render_text("".join(text))
+
+route('/admin/routes', RoutesViewer)             
+
 
 class Devnull(AppHandler):
     def get(self):

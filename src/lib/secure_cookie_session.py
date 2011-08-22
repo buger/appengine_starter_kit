@@ -3,7 +3,7 @@ import simplejson as json
 
 COOKIE_SECRET = 'af8559a6788b1ee9fbe34307bc1ac39caf8559a6788b1ee9fbe34307bc1ac39c'
 
-class Session:
+class CookieSession:
     def __init__(self, handler):
         self.cookieutil = LilCookies(handler, COOKIE_SECRET)
 

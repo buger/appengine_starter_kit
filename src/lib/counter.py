@@ -60,8 +60,6 @@ class CachedCounter(object):
         return int(value + incr)
 
     def incr(self, value=1):
-        if value < 0:
-            raise ValueError('CachedCounter cannot handle negative numbers.')
         def update_count(name, incr, error_possible=False):
             entity = Counter.get_by_key_name(name)
             if entity:
@@ -105,6 +103,10 @@ class CachedCounter(object):
                               self._name)
                 return stored_count
             else:
-                memcache.incr(self._incr_key, delta=value)
+                if value < 0:
+                    memcache.decr(self._incr_key, delta=-value)
+                else:
+                    memcache.incr(self._incr_key, delta=value)
+
                 logging.debug("incr(%s): incrementing memcache with %d", self._name, value)
                 return self.count
